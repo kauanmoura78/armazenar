@@ -1,23 +1,26 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-// Proteção para evitar que o app quebre em produção (Netlify/GitHub Pages)
-// onde o objeto 'process' pode não estar definido globalmente.
+// Função segura para obter a chave de API sem quebrar o código em produção
 const getApiKey = () => {
   try {
-    return process.env.API_KEY || "";
+    // Verifica se process e process.env existem antes de acessar
+    if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+      return process.env.API_KEY;
+    }
   } catch (e) {
-    return "";
+    console.warn("Ambiente de execução não possui process.env");
   }
+  return "";
 };
 
 const apiKey = getApiKey();
+// Inicializa apenas se houver chave, caso contrário mantém null para evitar erros
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 export const analyzeFile = async (fileName: string, mimeType: string, fileSize: number) => {
   if (!ai) {
-    console.warn("Gemini API Key não configurada. IA desativada.");
-    return "IA não configurada.";
+    return "IA indisponível (Chave de API não configurada).";
   }
 
   try {
@@ -36,6 +39,6 @@ export const analyzeFile = async (fileName: string, mimeType: string, fileSize: 
     return response.text || "Sem análise disponível.";
   } catch (error) {
     console.error("Erro ao analisar arquivo:", error);
-    return "Análise indisponível.";
+    return "Análise temporariamente indisponível.";
   }
 };

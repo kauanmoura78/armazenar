@@ -20,7 +20,7 @@ const App: React.FC = () => {
     const loadData = async () => {
       try {
         const savedNodes = await getAllFileNodes();
-        setNodes(savedNodes);
+        setNodes(savedNodes || []);
       } catch (error) {
         console.error("Erro ao carregar banco de dados local:", error);
       }
@@ -81,7 +81,7 @@ const App: React.FC = () => {
   };
 
   const handleResetStorage = async () => {
-    if (confirm("Tem certeza que deseja deletar TODOS os arquivos da sua nuvem local?")) {
+    if (confirm("Tem certeza que deseja deletar TODOS os arquivos da sua nuvem?")) {
       await clearAllStorage();
       setNodes([]);
     }
@@ -99,9 +99,9 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-[#0f172a] text-slate-200 overflow-hidden">
-      {/* Sidebar - Interface Limpa */}
+      {/* Sidebar - Agora limpa, sem a navegação central */}
       <aside className="w-72 border-r border-slate-800 bg-[#1e293b]/30 p-6 flex flex-col hidden md:flex">
-        {/* Logo Section */}
+        {/* Top: Logo */}
         <div className="flex items-center gap-3 mb-10">
           <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
             <Cloud className="w-6 h-6 text-white" />
@@ -112,16 +112,16 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Espaço Vazio Central (Partes Removidas) */}
+        {/* Middle: Espaço vazio conforme solicitado */}
         <div className="flex-1"></div>
 
-        {/* Bottom Section - Status e Reset */}
+        {/* Bottom: Apenas informações de armazenamento e botão de reset */}
         <div className="pt-6 border-t border-slate-800 space-y-4">
           <div>
             <div className="flex items-center justify-between mb-3 text-sm">
               <div className="flex items-center gap-2 text-slate-400 font-medium">
                 <HardDrive className="w-4 h-4" />
-                Armazenamento
+                Uso do Disco
               </div>
               <span className="text-slate-500 font-bold">{storagePercentage.toFixed(4)}%</span>
             </div>
@@ -131,12 +131,12 @@ const App: React.FC = () => {
                 style={{ width: `${storagePercentage}%` }}
               ></div>
             </div>
-            <p className="text-xs text-slate-500 font-medium">{formatSize(storageUsed)} de {STORAGE_LIMIT_GB >= 1024 ? (STORAGE_LIMIT_GB/1024).toFixed(0) + 'TB' : STORAGE_LIMIT_GB + 'GB'}</p>
+            <p className="text-xs text-slate-500 font-medium">{formatSize(storageUsed)} de 2TB</p>
           </div>
 
           <button 
             onClick={handleResetStorage}
-            className="w-full py-2.5 px-4 bg-slate-800/50 hover:bg-rose-500/10 border border-slate-700 hover:border-rose-500/30 rounded-xl text-xs font-semibold text-slate-400 hover:text-rose-400 transition-all flex items-center justify-center gap-2"
+            className="w-full py-2.5 px-4 bg-slate-800/30 hover:bg-rose-500/10 border border-slate-700 hover:border-rose-500/30 rounded-xl text-xs font-semibold text-slate-400 hover:text-rose-400 transition-all flex items-center justify-center gap-2"
           >
             <Trash2 className="w-3.5 h-3.5" /> Esvaziar Toda a Nuvem
           </button>
@@ -152,7 +152,7 @@ const App: React.FC = () => {
         <header className="h-20 border-b border-slate-800 flex items-center justify-between px-10 bg-[#0f172a]/40 backdrop-blur-xl sticky top-0 z-10">
           <div>
             <h1 className="text-xl font-bold">Arquivos da Nuvem</h1>
-            <p className="text-xs text-slate-500">Sincronizado em tempo real</p>
+            <p className="text-xs text-slate-500">Sincronizado Localmente</p>
           </div>
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2 text-xs font-medium">
@@ -161,7 +161,7 @@ const App: React.FC = () => {
               ) : (
                 <div className="flex items-center gap-2">
                   <CloudCheck className="w-4 h-4 text-emerald-500" />
-                  <span className="text-emerald-500 uppercase tracking-tighter">Nuvem Atualizada</span>
+                  <span className="text-emerald-500 uppercase tracking-tighter">Status: Ativo</span>
                 </div>
               )}
             </div>
@@ -191,6 +191,7 @@ const App: React.FC = () => {
                 <div className="flex flex-col items-center justify-center py-32 text-slate-500">
                   <Cloud className="w-16 h-16 opacity-10 mb-6" />
                   <p className="text-lg font-medium text-slate-400">Sua nuvem está vazia</p>
+                  <p className="text-sm opacity-60">Arraste seus arquivos para começar.</p>
                 </div>
               )}
             </div>
