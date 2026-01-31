@@ -1,10 +1,25 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-// Initialize the Gemini API client using the environment variable as per guidelines.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Proteção para evitar que o app quebre em produção (Netlify/GitHub Pages)
+// onde o objeto 'process' pode não estar definido globalmente.
+const getApiKey = () => {
+  try {
+    return process.env.API_KEY || "";
+  } catch (e) {
+    return "";
+  }
+};
+
+const apiKey = getApiKey();
+const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 export const analyzeFile = async (fileName: string, mimeType: string, fileSize: number) => {
+  if (!ai) {
+    console.warn("Gemini API Key não configurada. IA desativada.");
+    return "IA não configurada.";
+  }
+
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
@@ -18,7 +33,6 @@ export const analyzeFile = async (fileName: string, mimeType: string, fileSize: 
       },
     });
 
-    // Access the .text property directly as per the latest SDK guidelines.
     return response.text || "Sem análise disponível.";
   } catch (error) {
     console.error("Erro ao analisar arquivo:", error);
