@@ -1,44 +1,34 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-// Função segura para obter a chave de API sem quebrar o código em produção
-const getApiKey = () => {
+// Função ultra-segura para extrair a chave sem causar erro de referência
+const safeGetApiKey = (): string => {
   try {
-    // Verifica se process e process.env existem antes de acessar
-    if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
-      return process.env.API_KEY;
-    }
-  } catch (e) {
-    console.warn("Ambiente de execução não possui process.env");
+    return process?.env?.API_KEY || "";
+  } catch {
+    return "";
   }
-  return "";
 };
 
-const apiKey = getApiKey();
-// Inicializa apenas se houver chave, caso contrário mantém null para evitar erros
+const apiKey = safeGetApiKey();
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 export const analyzeFile = async (fileName: string, mimeType: string, fileSize: number) => {
-  if (!ai) {
-    return "IA indisponível (Chave de API não configurada).";
-  }
+  if (!ai) return "IA desativada (Sem chave configurada).";
 
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: `Analise este arquivo e forneça um resumo curto (máximo 15 palavras) sobre o que ele provavelmente é ou para que serve baseado no nome e tipo. 
-      Arquivo: ${fileName}
-      Tipo: ${mimeType}
-      Tamanho: ${(fileSize / 1024).toFixed(2)} KB`,
+      contents: `Analise este arquivo: ${fileName} (${mimeType}). Resumo de 10 palavras sobre sua utilidade.`,
       config: {
-        systemInstruction: "Você é um assistente de organização de arquivos eficiente e direto.",
-        temperature: 0.2,
+        systemInstruction: "Você é um organizador de arquivos direto.",
+        temperature: 0.1,
       },
     });
 
-    return response.text || "Sem análise disponível.";
+    return response.text || "Sem análise.";
   } catch (error) {
-    console.error("Erro ao analisar arquivo:", error);
-    return "Análise temporariamente indisponível.";
+    console.error("Erro IA:", error);
+    return "Análise indisponível no momento.";
   }
 };
