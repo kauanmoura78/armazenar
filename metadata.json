@@ -1,0 +1,5 @@
+{
+  "name": "CloudFlow - Armazenamento Inteligente",
+  "description": "Um gerenciador de arquivos moderno com suporte a drag-and-drop de pastas, download instantâneo e análise inteligente de arquivos usando Gemini.",
+  "requestFramePermissions": []
+}
